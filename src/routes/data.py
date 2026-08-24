@@ -20,7 +20,9 @@ data_router = APIRouter(
 async def upload_file(request: Request, project_id: str, file: UploadFile,
                        app_settings: Settings = Depends(get_settings)):  
 
-    project_model = ProjectModel(request.app.db_client)
+    project_model = await ProjectModel.create_instance(
+        db_client=request.app.db_client
+    )
 
     project = await project_model.get_project_or_create_one(project_id=project_id)
 
@@ -60,10 +62,15 @@ async def upload_file(request: Request, project_id: str, file: UploadFile,
 @data_router.post("/process/{project_id}")
 async def process_endpoint(request: Request, project_id: str, process_request: ProcessRequest):
 
-    project_model = ProjectModel(request.app.db_client)
+    project_model = await ProjectModel.create_instance(
+        db_client=request.app.db_client
+    )
+
     project = await project_model.get_project_or_create_one(project_id=project_id)
 
-    chunk_model = chunkModel(request.app.db_client)
+    chunk_model = await chunkModel.create_instance(
+        request.app.db_client
+    )
 
     file_id = process_request.file_id
     chunk_size = process_request.chunk_size
