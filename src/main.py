@@ -1,19 +1,22 @@
+from contextlib import asynccontextmanager
+
+from async_pymongo import AsyncClient
 from fastapi import FastAPI
-from routes import base, data
+
 from helpers.config import Settings
-from motor.motor_asyncio import AsyncIOMotorClient
+from routes import base, data
 
-app = FastAPI()
 
-@app.on_event("startup")
-async def startup_db_client():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     settings = Settings()
-    app.mongo_conn = AsyncIOMotorClient(settings.MONGODB_URI)
+    app.mongo_conn = AsyncClient(settings.MONGODB_URI)
     app.db_client = app.mongo_conn[settings.MONGODB_DATABASE]
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
+    yield
     app.mongo_conn.close()
+
+app = FastAPI(lifespan=lifespan)
 
                   
 app.include_router(base.base_router)
