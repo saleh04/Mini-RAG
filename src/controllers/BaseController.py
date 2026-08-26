@@ -1,7 +1,9 @@
-from helpers.config import get_settings
+import os  # noqa: N999
 import random
 import string
-import os
+
+from helpers.config import get_settings
+
 
 class BaseController:
     def __init__(self):

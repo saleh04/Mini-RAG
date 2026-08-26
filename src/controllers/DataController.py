@@ -1,10 +1,13 @@
-import os
+import os  # noqa: N999
+import re
+
+from fastapi import UploadFile
+
+from models import ResponseSignal
 
 from .BaseController import BaseController
 from .ProjectController import ProjectController
-from fastapi import UploadFile
-from models import ResponseSignal
-import re
+
 
 class DataController(BaseController):
     def __init__(self):
