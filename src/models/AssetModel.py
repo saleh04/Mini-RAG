@@ -1,8 +1,9 @@
+from bson.objectid import ObjectId  # noqa: N999
+
 from .BaseDataModel import BaseDataModel
 from .db_schemes import Asset
 from .enums.DataBaseEnums import DataBaseEnum
-from bson.objectid import ObjectId
-from pymongo import InsertOne
+
 
 class AssetModel(BaseDataModel):
     def __init__(self, db_client: object):
@@ -29,7 +30,7 @@ class AssetModel(BaseDataModel):
 
     async def create_asset(self, asset: Asset):
 
-        result = await self.collection.insert_one(asset.dict(by_alias=True, exclude_unset=True))
+        result = await self.collection.insert_one(asset.model_dump(by_alias=True, exclude_unset=True))
         asset.id = result.inserted_id
 
         return asset
@@ -42,7 +43,7 @@ class AssetModel(BaseDataModel):
         }).to_list(length=None)
 
         return [
-            Asset(**record)
+            Asset.model_validate(record)
             for record in records
         ]
 
@@ -54,7 +55,7 @@ class AssetModel(BaseDataModel):
         })
 
         if record:
-            return Asset(**record)
+            return Asset.model_validate(record)
 
         return None
     

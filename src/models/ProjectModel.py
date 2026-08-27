@@ -1,6 +1,7 @@
-from .BaseDataModel import BaseDataModel
+from .BaseDataModel import BaseDataModel  # noqa: N999
 from .db_schemes.project import Project
 from .enums.DataBaseEnums import DataBaseEnum
+
 
 class ProjectModel(BaseDataModel):
 
@@ -16,7 +17,7 @@ class ProjectModel(BaseDataModel):
 
     async def init_collection(self):
         all_collections = await self.db_client.list_collection_names()
-        if DataBaseEnum.COLLECTION_PROJECT_NAME not in all_collections:
+        if DataBaseEnum.COLLECTION_PROJECT_NAME.value not in all_collections:
             self.collection = self.db_client[DataBaseEnum.COLLECTION_PROJECT_NAME.value]
             indexes = Project.get_index()
             for index in indexes:
@@ -28,7 +29,9 @@ class ProjectModel(BaseDataModel):
 
     async def create_project(self, project: Project):
         
-        result = await self.collection.insert_one(project.dict(by_alias=True,exclude_unset=True))
+        result = await self.collection.insert_one(
+            project.model_dump(by_alias=True, exclude_unset=True)
+        )
         project.id =result.inserted_id
         return project
 
@@ -40,24 +43,24 @@ class ProjectModel(BaseDataModel):
 
         if record is None:
             # create new project
-            project = Project(project_id=project_id)
+            project = Project(project_id=project_id) 
             project = await self.create_project(project=project)
 
             return project
         
-        return Project(**record)
+        return Project.model_validate(record)
 
     async def get_all_projects(self, page: int=1, page_size: int=10):
 
         total_doc = await self.collection.count_documents({})
 
         total_pages = total_doc // page_size
-        if total_pages % page_size > 0:
+        if total_doc % page_size > 0:
             total_pages += 1
 
         cursor = self.collection.find().skip((page - 1) * page_size).limit(page_size)
         projects = []
         async for doc in cursor:
-            projects.append(Project(**doc))
+            projects.append(Project.model_validate(doc))
 
         return projects, total_pages

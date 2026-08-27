@@ -1,8 +1,10 @@
+from bson.objectid import ObjectId  # noqa: N999
+from pymongo import InsertOne
+
 from .BaseDataModel import BaseDataModel
 from .db_schemes import DataChunk
 from .enums.DataBaseEnums import DataBaseEnum
-from bson.objectid import ObjectId
-from pymongo import InsertOne
+
 
 class chunkModel(BaseDataModel):
     def __init__(self, db_client: object):
@@ -27,9 +29,10 @@ class chunkModel(BaseDataModel):
                     unique=index['unique']
                 )
 
-
     async def create_chunk(self, chunk: DataChunk):
-        result = await self.collection.insert_one(chunk.dict(by_alias=True,exclude_unset=True))
+        result = await self.collection.insert_one(
+            chunk.model_dump(by_alias=True, exclude_unset=True)
+        )
         chunk.id = result.inserted_id
         return chunk
 
@@ -41,7 +44,7 @@ class chunkModel(BaseDataModel):
         if result is None:
             return None
 
-        return DataChunk(**result)
+        return DataChunk.model_validate(result)
 
     async def insert_many_chunks(self, chunks:list, batch_size: int=100):
 
@@ -49,7 +52,7 @@ class chunkModel(BaseDataModel):
             batch = chunks[i:i+batch_size]
 
             operation = [
-                InsertOne(chunk.dict(by_alias=True, exclude_unset=True))
+                InsertOne(chunk.model_dump(by_alias=True, exclude_unset=True))
                 for chunk in batch
             ]
 
