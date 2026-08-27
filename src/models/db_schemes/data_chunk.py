@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class DataChunk(BaseModel):
     id: ObjectId | None = Field(None, alias="_id")
-    chunk_text: str = Field(..., min_lenght=1)
+    chunk_text: str = Field(..., min_length=1)
     chunk_metadata: dict
     chunk_order:int = Field(..., gt=0)
     chunk_project_id: ObjectId
