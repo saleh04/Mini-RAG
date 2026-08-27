@@ -1,4 +1,5 @@
-from enum import Enum
+from enum import Enum  # noqa: N999
+
 
 class DataBaseEnum(Enum):
 
