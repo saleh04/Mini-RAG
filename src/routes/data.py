@@ -1,7 +1,7 @@
 import logging
 import os
 
-import aiofiles
+import aiofiles  # type: ignore[import-untyped]
 from fastapi import APIRouter, Depends, Request, UploadFile, status
 from fastapi.responses import JSONResponse
 
@@ -23,7 +23,7 @@ data_router = APIRouter(
 
 @data_router.post("/upload/{project_id}")
 async def upload_file(request: Request, project_id: str, file: UploadFile,
-                       app_settings: Settings = Depends(get_settings)):  
+                       app_settings: Settings = Depends(get_settings)):  # noqa: B008
 
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
@@ -47,15 +47,14 @@ async def upload_file(request: Request, project_id: str, file: UploadFile,
             content={"message": response_message}
         )
 
-
     file_path, file_id = datacontroller.generate_unique_filepath(
-        original_filename=file.filename, project_id=project_id)
+        original_filename=file.filename or "unnamed_file", project_id=project_id)
 
     try:
         async with aiofiles.open(file_path, 'wb') as f:
             while chunk := await file.read(app_settings.FILE_DEFAULT_CHUNK_SIZE):
                 await f.write(chunk)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logger.error(f"Error occurred while saving the file: {e}")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -131,7 +130,7 @@ async def process_endpoint(request: Request, project_id: str, process_request: P
 
     process_controller = ProcessController(project_id=project_id)
 
-    if do_reset == True:
+    if do_reset:
         _= await chunk_model.delete_chunks_by_project_id(project_id=project.id)
 
     no_records = 0
