@@ -1,0 +1,24 @@
+from enum import Enum  # noqa: N999
+
+
+class LLMEnums(Enum):
+    OPENAI = "OPENAI"
+    COHERE = "COHERE"
+
+class OpenAIEnums(Enum):
+    SYSTEM = "system"
+    USER = "user"
+    ASSISTANT = "assistant"
+
+class CohereEnums(Enum):
+    SYSTEM = "system"
+    USER = "user"
+    ASSISTANT = "assistant"
+    TOOL = "tool"
+
+    DOCUMENT = "search_document"
+    QUERY = "search_query"
+
+class DocumentTypeEnum(Enum):
+    DOCUMENT = "document"
+    QUERY = "query"
