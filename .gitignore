@@ -220,6 +220,5 @@ __marimo__/
 .streamlit/secrets.toml
 
 .vscode
-.vscode/
 __pycache__
 .mypy_cache
