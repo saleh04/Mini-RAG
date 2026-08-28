@@ -5,7 +5,6 @@ class Settings(BaseSettings):
 
     APP_NAME: str
     APP_VERSION: str
-    OPENAI_API_KEY: str
     
     FILE_ALLOWED_TYPES: list
     FILE_ALLOWED_SIZES_MB: int
@@ -13,6 +12,21 @@ class Settings(BaseSettings):
 
     MONGODB_URI: str
     MONGODB_DATABASE: str
+
+    GENERATION_BACKEND: str
+    EMBEDDING_BACKEND: str
+
+    OPENAI_API_KEY: str | None = None
+    OPENAI_API_URL: str | None = None
+    COHERE_API_KEY: str | None = None
+
+    GENERATION_MODEL_ID: str | None = None
+    EMBEDDING_MODEL_ID: str | None = None
+    EMBEDDING_MODEL_SIZE: int | None = None
+
+    INPUT_DEFAULT_MAX_CHARACTERS: int 
+    GENERATION_DEFAULT_MAX_TOKENS: int | None = None
+    GENERATION_DEFAULT_TEMP: int | None = None
 
     model_config = SettingsConfigDict(env_file=".env")
 
