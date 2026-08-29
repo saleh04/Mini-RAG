@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     GENERATION_DEFAULT_MAX_TOKENS: int | None = None
     GENERATION_DEFAULT_TEMP: int | None = None
 
+
+    VECTOR_DB_BACKEND: str
+    VECTOR_DB_PATH: str
+    VECTOR_DB_DISTANCE_METHOD: str | None = None
+
     model_config = SettingsConfigDict(env_file=".env")
 
 
