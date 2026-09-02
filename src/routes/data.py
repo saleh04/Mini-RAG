@@ -19,14 +19,14 @@ logger = logging.getLogger("uvicorn.error")
 
 data_router = APIRouter(
     prefix="/api/v1/data",
-    tags=["api_V1_data"] )
+    tags=["Data"] )
 
 @data_router.post("/upload/{project_id}")
 async def upload_file(request: Request, project_id: str, file: UploadFile,
                        app_settings: Settings = Depends(get_settings)):  # noqa: B008
 
     project_model = await ProjectModel.create_instance(
-        db_client=request.app.db_client
+        db_client=request.app.state.db_client
     )
 
     project = await project_model.get_project_or_create_one(
@@ -34,7 +34,7 @@ async def upload_file(request: Request, project_id: str, file: UploadFile,
     )
 
     asset_model = await AssetModel.create_instance(
-        db_client=request.app.db_client
+        db_client=request.app.state.db_client
     )
 
     datacontroller = DataController()
@@ -85,7 +85,7 @@ async def process_endpoint(request: Request, project_id: str, process_request: P
     do_reset = process_request.do_reset
 
     project_model = await ProjectModel.create_instance(
-        db_client=request.app.db_client
+        db_client=request.app.state.db_client
     )
 
     project = await project_model.get_project_or_create_one(
@@ -93,11 +93,11 @@ async def process_endpoint(request: Request, project_id: str, process_request: P
     )
 
     chunk_model = await chunkModel.create_instance(
-        request.app.db_client
+        db_client=request.app.state.db_client
     )
 
     asset_model = await AssetModel.create_instance(
-        db_client=request.app.db_client
+        db_client=request.app.state.db_client
     )
 
     project_files_ids = {}
@@ -172,6 +172,7 @@ async def process_endpoint(request: Request, project_id: str, process_request: P
         no_files += 1
 
     return JSONResponse(
+        status_code=status.HTTP_200_OK,
         content={
             'message' : ResponseSignal.PROCESSING_SUCCESS.value,
             'inserted_chunks' : no_records,
