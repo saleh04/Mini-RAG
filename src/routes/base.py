@@ -4,7 +4,7 @@ from helpers.config import Settings, get_settings
 
 base_router = APIRouter(
     prefix="/api/v1",
-    tags=["api_V1"]
+    tags=["Base"]
 )
 
 @base_router.get("/")

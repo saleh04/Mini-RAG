@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     INPUT_DEFAULT_MAX_CHARACTERS: int 
     GENERATION_DEFAULT_MAX_TOKENS: int | None = None
-    GENERATION_DEFAULT_TEMP: int | None = None
+    GENERATION_DEFAULT_TEMP: float | None = None
 
 
     VECTOR_DB_BACKEND: str
