@@ -1,7 +1,8 @@
-from ...helpers.config import Settings  # noqa: N999
-from .LLMEnums import LLMEnums
-from .providers import CohereProvider, OpenAIProvider
+from helpers.config import Settings  # noqa: N999
 
+from .LLMEnums import LLMEnums
+from .providers.OpenAIProvider import OpenAIProvider
+from .providers.CohereProvider import CohereProvider
 
 class LLMProviderFactory:
     def __init__(self, config: Settings):

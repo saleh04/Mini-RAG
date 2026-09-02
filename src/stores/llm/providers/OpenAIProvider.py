@@ -94,6 +94,23 @@ class OpenAIProvider(LLMInterface):
 
         return response.data[0].embedding
 
+    def embed_batch_texts(self, texts: list[str], document_type: str | None = None):
+
+        if not self.client or not self.embedding_model_id:
+            self.logger.error("OpenAI Client or Model not set")
+            return None
+
+        response = self.client.embeddings.create(
+            model=self.embedding_model_id,
+            input=texts
+        )
+
+        if not response or not response.data or len(response.data) == 0:
+            self.logger.error("Error while embedding batch texts with OpenAI")
+            return None
+
+        return [item.embedding for item in response.data]
+
     def construct_prompt(self, prompt:str, role:str):
         return {
             "role" : role,
