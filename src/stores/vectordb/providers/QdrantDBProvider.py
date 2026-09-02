@@ -32,10 +32,10 @@ class QdrantDB(VectorDBInterface):
         return self.client.collection_exists(collection_name=collection_name)
 
     def list_all_collections(self) -> list:
-        return self.client.get_collections()
+        return self.client.get_collections().collections
 
     def get_collection_info(self, collection_name: str) -> dict:
-        return self.client.get_collection(collection_name=collection_name)
+        return self.client.get_collection(collection_name=collection_name).model_dump()
 
     def delete_collection(self, collection_name: str):
         if self.client.collection_exists(collection_name=collection_name):
@@ -98,23 +98,25 @@ class QdrantDB(VectorDBInterface):
         if record_ids is None:
             record_ids = [str(uuid.uuid4()) for _ in range(len(texts))]
 
-            points = [
-                models.PointStruct(
-                    id = record_ids[i],
-                    vector=vectors[i],
-                    payload= {"chunk_text" : texts[i], "metadata" : metadata[i]}
-                )
-                for i in range(len(texts))
+        points = [
+            models.PointStruct(
+                id = record_ids[i],
+                vector=vectors[i],
+                payload= {"chunk_text" : texts[i], "metadata" : metadata[i]}
+            )
+            for i in range(len(texts))
             ]
 
-            try:
-                _ = self.client.upload_points(
-                    collection_name=collection_name,
-                    points=points
-                )
-            except Exception as e:  # noqa: BLE001
-                self.logger.error(f"Error while inserting batch {e}")
-                return False
+        try:
+            _ = self.client.upload_points(
+                collection_name=collection_name,
+                points=points,
+                batch_size=batch_size,
+                wait=True
+            )
+        except Exception as e:  # noqa: BLE001
+            self.logger.error(f"Error while inserting batch {e}")
+            return False
 
         return True
 
@@ -123,7 +125,8 @@ class QdrantDB(VectorDBInterface):
         hits = self.client.query_points(
             collection_name=collection_name,
             query=vector,
-            limit=limit
+            limit=limit,
         ).points
 
-        return [{"payload": hit.payload, "score": hit.score} for hit in hits]
+        return [{"payload": hit.payload, "score": hit.score} for hit in hits]   
+

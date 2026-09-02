@@ -1,6 +1,6 @@
 from controllers.BaseController import BaseController # noqa: N999
 
-from ...helpers.config import Settings  
+from helpers.config import Settings  
 from .providers import QdrantDB
 from .VectorDBEnums import VectorDBEnums
 
@@ -8,11 +8,11 @@ from .VectorDBEnums import VectorDBEnums
 class VectorDBProviderFactory:
     def __init__(self, config: Settings):
         self.config = config
-        self.base_controller = BaseController
-
+        self.BaseController = BaseController()
+        
     def create(self, provider: str):
         if provider == VectorDBEnums.QDRANT.value:
-            db_path = self.base_controller.get_database_path(db_name=self.config.VECTOR_DB_PATH)
+            db_path = self.BaseController.get_database_path(db_name=self.config.VECTOR_DB_PATH)
 
             return QdrantDB(
                 db_path=db_path,
