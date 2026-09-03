@@ -7,6 +7,7 @@ from scalar_fastapi import get_scalar_api_reference
 from helpers.config import Settings
 from routes import base, data, nlp
 from stores.llm.LLMProviderFactory import LLMProviderFactory
+from stores.llm.templates.template_parser import TemplateParser
 from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
 
 
@@ -34,11 +35,15 @@ async def lifespan(app: FastAPI):
     # VectorDB
     app.state.vectordb_client = vectordb_provider_factory.create(settings.VECTOR_DB_BACKEND)
     app.state.vectordb_client.connect()
+
+    app.state.template_parser = TemplateParser(language=settings.PRIMARY_LANGUAGE,
+                                            default_language=settings.DEFAULT_LANGUAGE)
     
     yield
 
     app.state.mongo_conn.close()
     app.state.vectordb_client.disconnect()
+
 
 app = FastAPI(lifespan=lifespan)
 
