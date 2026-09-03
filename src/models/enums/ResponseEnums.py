@@ -23,3 +23,6 @@ class ResponseSignal(Enum):
 
     SEARCH_RESULTS_SUCCESS = "search_results_retrieved_successfully"
     SEARCH_RESULTS_ERROR = "search_results_retrieval_failed"
+
+    RAG_ANSWER_SUCCESS = "rag_answer_retrieved_successfully"
+    RAG_ANSWER_ERROR = "rag_answer_retrieval_failed"
