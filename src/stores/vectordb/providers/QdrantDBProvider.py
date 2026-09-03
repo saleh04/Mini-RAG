@@ -5,6 +5,7 @@ from qdrant_client import QdrantClient, models
 
 from ..VectorDBEnums import DistanceMethodEnums
 from ..VectorDBInterface import VectorDBInterface
+from models.db_schemes import RetrievedDocument
 
 
 class QdrantDB(VectorDBInterface):
@@ -128,5 +129,14 @@ class QdrantDB(VectorDBInterface):
             limit=limit,
         ).points
 
-        return [{"payload": hit.payload, "score": hit.score} for hit in hits]   
+        if not hits or len(hits) == 0:
+            return None
+
+        return [
+            RetrievedDocument(
+                text=hit.payload.get("chunk_text"),
+                score=hit.score
+            )
+                for hit in hits
+        ]   
 
